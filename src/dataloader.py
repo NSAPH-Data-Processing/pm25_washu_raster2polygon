@@ -54,7 +54,7 @@ def main(cfg: DictConfig):
 
     components = cfg.dataloader_components
     transform = transforms.Resize(cfg.grid_size)
-    transform = None
+    # transform = None
 
     root_dir = "data/input/pm25_components__washu__grid_0_1__dataloader/monthly"
     dataset = ComponentsWashuDataset(
@@ -104,18 +104,31 @@ def main(cfg: DictConfig):
     with open(summary_file, "w") as f:
         json.dump(summary, f, indent=2)
 
-    # == test the composed standardized transform
-    transform = transforms.Compose(
-        [
-            transforms.Resize(cfg.grid_size),
-            transforms.Normalize(mean=means, std=stds),
-        ]
-    )
-    dataset.transform = transform
+    # == end of pipeline ===
 
-    for batch in loader:
-        pass
-
+    # == Example how you would use it for training, just need to normalize in the transform ===
+    # transform = transforms.Compose(
+    #     [
+    #         transforms.Resize(cfg.grid_size),
+    #         transforms.Normalize(mean=means, std=stds),
+    #     ]
+    # )
+    # dataset = ComponentsWashuDataset(
+    #     root_dir=root_dir,
+    #     transform=transform,
+    #     components=components,
+    # )
+    # 
+    #  loader = DataLoader(
+    #      dataset,
+    #      batch_size=8,
+    #      shuffle=True,
+    #      num_workers=4,
+    #      pin_memory=True,
+    #      persistent_workers=True,
+    #  )
+    # for batch in loader:
+    #     pass
 
 if __name__ == "__main__":
     main()

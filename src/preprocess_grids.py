@@ -67,8 +67,8 @@ def main(cfg):
         ds = ds.interp(**new_dict)
         
         # update Delta_Lat and Delta_Lon attributes in the dataset
-        ds.attrs["Delta_Lat"] = resolution
-        ds.attrs["Delta_Lon"] = resolution
+        # ds.attrs["Delta_Lat"] = resolution
+        # ds.attrs["Delta_Lon"] = resolution
 
         # extract year and name from the filename
         # filename pattern V5NA04.02.HybridSO4-SO4.NorthAmerica.yyyy-yyyy-MMM.nc
