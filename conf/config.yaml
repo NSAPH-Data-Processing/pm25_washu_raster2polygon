@@ -21,21 +21,22 @@ component: no3   # used for the download and resize scripts
 
 
 # == bounding box and resolution for the data loaders  TODO
-# bounding_box:
-#   min_lat: 20
-#   max_lat: 52
-#   min_lon: -135
-#   max_lon: -60
-# resolution: 0.1  # degrees
-# dataloader_components: 
-#   - no3
-#   - pm25
-#   - so4
-#   - ss
-#   - nh4
-#   - dust
-#   - bc
-#   - om
+bbox:
+  min_lat: 20
+  max_lat: 52
+  min_lon: -135
+  max_lon: -60
+resolution: 0.1  # degrees
+dataloader_components: 
+  - no3
+  - pm25
+  - so4
+  - ss
+  - nh4
+  - dust
+  - bc
+  - om
+grid_size: [128, 256]  # grid size
 
 hydra:
   run:

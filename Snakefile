@@ -1,4 +1,4 @@
-import yaml
+# import yaml
 from src.aggregate_pm25 import available_shapefile_year
 from hydra import compose, initialize
 
@@ -18,6 +18,10 @@ configfile: "conf/snakemake.yaml"
 temporal_freq = config['temporal_freq']
 polygon_name = config['polygon_name']
 components = config['components']
+
+# resolution in degrees for the dataloader
+resolution = config['dataloader_resolution']
+resolution_str = str(resolution).replace(".", "_")
 
 with initialize(version_base=None, config_path="conf"):
     hydra_cfg = compose(config_name="config", overrides=[f"temporal_freq={temporal_freq}", f"polygon_name={polygon_name}"])
@@ -59,19 +63,53 @@ rule download_satellite_pm25:
 rule download_all_components:
     input:
         expand(
-            f"data/input/satellite_components/{temporal_freq}/{{component}}/",
+            f"data/input/pm25_components__washu__raw/{temporal_freq}/{{component}}/",
             component=components
         )
 
 
 rule download_component:
     output:
-        directory(f"data/input/satellite_components/{config['temporal_freq']}/{{component}}/")
+        directory(f"data/input/pm25_components__washu__raw/{config['temporal_freq']}/{{component}}/")
     log:    
         "logs/download_components_{component}.log"
     shell:
-        f"python src/download_components.py temporal_freq={config['temporal_freq']}"
-        " component={wildcards.component} &> {log}"
+        f"python src/download_components.py temporal_freq={config['temporal_freq']} component={{wildcards.component}} &> {{log}}"
+
+
+rule preprocess_all_components_dataloader:
+    input:
+        expand(
+            f"data/input/pm25_components__washu__grid_{resolution_str}__dataloader/{temporal_freq}/{{component}}/",
+            component=components
+        )
+
+
+rule preprocess_component_dataloader:
+    input:
+        f"data/input/pm25_components__washu__raw/{temporal_freq}/{{component}}/" 
+    output:
+        directory(f"data/input/pm25_components__washu__grid_{resolution_str}__dataloader/{temporal_freq}/{{component}}/")
+    log:
+        "logs/preprocess_component_{component}.log"
+    shell:
+        f"python src/preprocess_grids.py temporal_freq={temporal_freq}"
+        f" component={{wildcards.component}} resolution={resolution} &> {{log}}"
+
+
+rule dataloader:
+    input:
+        expand(
+            f"data/input/pm25_components__washu__grid_{resolution_str}__dataloader/{temporal_freq}/{{component}}/",
+            component=components
+        )
+    output:
+       f"data/input/pm25_components__washu__grid_{resolution_str}__dataloader/{temporal_freq}/summary.json"
+    log:
+        "logs/dataloader.log"
+    shell:
+        f"python src/dataloader.py temporal_freq={temporal_freq} resolution={resolution} &> {{log}}"
+
 
 
 def get_shapefile_input(wildcards):

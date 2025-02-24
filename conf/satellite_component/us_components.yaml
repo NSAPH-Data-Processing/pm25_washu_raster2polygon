@@ -20,7 +20,16 @@ monthly:
   # "V5GL04.HybridPM25.NorthAmerica" #lower resolution
   # "V5GL04.HybridPM25c_0p10.NorthAmerica" #higher resolution
 
-layer: ??? # changes on the basis of the component, but each download has only 1 layer
+layer:
+  no3: GWRNO3
+  pm25: GWRPM25
+  so4: GWRSO4
+  ss: GWRSS
+  nh4: GWRNH4
+  dust: GWRDUST
+  bc: GWRBC
+  om: GWROM
+  
 latitude_layer: "lat"
 longitude_layer: "lon"
 component: no3

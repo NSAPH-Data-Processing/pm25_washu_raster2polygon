@@ -9,3 +9,4 @@ components:
   - dust
   - bc
   - om
+dataloader_resolution: 0.1  # degrees
