@@ -152,4 +152,5 @@ def example(
 
 if __name__ == "__main__":
     main()
+    # example("data/input/pm25_components__washu__grid_0_1__dataloader/monthly")
 
