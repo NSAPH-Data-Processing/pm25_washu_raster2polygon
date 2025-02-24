@@ -150,12 +150,13 @@ def example(
 
     for batch in loader:
         # get mask of nans
-        nonnan_mask = (~ torch.isnan(batch)).prod(dim=1).float()
+        nonnan_mask = (~ torch.isnan(batch)).float()
 
-        # pad with zero
+        # pad with zero for the computation
         batch_padded = torch.nan_to_num(batch, nan=0.0)
 
         # rest of training logic...
+        # e.g., out = model(batch_padded); loss = F.mse_loss(out * nonnan_mask, target * nonnan_mask)
 
 
 if __name__ == "__main__":
