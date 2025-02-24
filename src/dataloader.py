@@ -121,6 +121,9 @@ def example(
     means = [summary["means"][component] for component in components]
     stds = [summary["stds"][component] for component in components]
 
+    # two tranforms are needed: first, although the data is already at 0.1 resolution,
+    # it's convenient to further resize to a power of two each dimension
+    # second, normalize the data using the means and stds
     transform = transforms.Compose(
         [
             transforms.Resize(grid_size),
@@ -146,8 +149,13 @@ def example(
     )
 
     for batch in loader:
-        # training logic here ...
-        pass
+        # get mask of nans
+        nonnan_mask = (~ torch.isnan(batch)).prod(dim=1).float()
+
+        # pad with zero
+        batch_padded = torch.nan_to_num(batch, nan=0.0)
+
+        # rest of training logic...
 
 
 if __name__ == "__main__":
