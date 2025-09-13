@@ -1,13 +1,14 @@
-# if files are stored within the local copy of the repository, then use null:
-input:
-  pm25__randall__raw: 
-    yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/raw/yearly #/n/netscratch/dominici_lab/Lab/pm25__randall__raw/yearly 
-    monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/raw/monthly #/n/netscratch/dominici_lab/Lab/pm25__randall__raw/monthly
-  shapefiles: null
+base_path: data/V5GL
 
-output:
-  pm25__randall: 
-    zcta_yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/zcta_yearly
-    zcta_monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/zcta_monthly
-    county_yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/county_yearly
-    county_monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/county_monthly
+dirs:
+  input:
+    raw: 
+      yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/raw/yearly #/n/netscratch/dominici_lab/Lab/pm25__randall__raw/yearly 
+      monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/raw/monthly #/n/netscratch/dominici_lab/Lab/pm25__randall__raw/monthly
+    shapefiles: null
+
+  output:
+    zcta_yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/zcta_yearly
+    zcta_monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/zcta_monthly
+    county_yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/county_yearly
+    county_monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/county_monthly
