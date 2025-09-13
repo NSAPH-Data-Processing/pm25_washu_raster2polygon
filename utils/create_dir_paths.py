@@ -5,17 +5,21 @@ from omegaconf import DictConfig
 
 LOGGER = logging.getLogger(__name__)
 
-def init_folder(datapath="data", folder_cfg=None):
+def init_folder(folder_cfg=None):
     folder_dict = folder_cfg.dirs
-    if not os.path.exists(datapath):
-        LOGGER.info(f"Error: {datapath} does not exists.")
-        return
     
-    # appending name of geography to root datapath
-    if folder_cfg.name is not None:
-        datapath = os.path.join(datapath, folder_cfg.name)
+    # defines a base path for the data
+    datapath = folder_cfg.base_path
+    if datapath is None:
+        datapath = "data"
+    # check if datapath exists, if not create it 
+    if os.path.exists(datapath):
+        LOGGER.info(f"Base path {datapath} already exists")
+    else:
+        LOGGER.info(f"Creating base path {datapath}")
         os.makedirs(datapath, exist_ok=True)
 
+    # create subfolders and symbolic links
     create_subfolders_and_links(datapath=datapath, folder_dict=folder_dict)
 
 def create_subfolders_and_links(datapath="data", folder_dict=None):
