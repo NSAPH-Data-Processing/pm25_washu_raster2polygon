@@ -1,0 +1,18 @@
+yearly:
+  url: https://wustl.app.box.com/s/s7eiaxytjr9w1z7glat45cesitcemprv/folder/327763225614
+
+  zipname: Annual
+
+  file_prefix: "V6GL02.04.CNNPM25.0p10.NA"
+  #file name convention is V6GL02.04.CNNPM25.0p10.NA.yyyymm-yyyymm.nc
+
+monthly: 
+  url: https://wustl.app.box.com/s/s7eiaxytjr9w1z7glat45cesitcemprv/folder/327764742544
+  zipname: Monthly
+
+  file_prefix: "V6GL02.04.CNNPM25.0p10.NA"
+  #file name convention is V6GL02.04.CNNPM25.0p10.NA.yyyymm-yyyymm.nc
+
+layer: "GWRPM25" #geographic weighted regression PM2.5
+latitude_layer: "lat"
+longitude_layer: "lon"

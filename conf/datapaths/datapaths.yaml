@@ -1,12 +1,13 @@
-# if files are stored within the local copy of the repository, then use null:
-input:
-  pm25__randall__raw: 
-    yearly: null
-    monthly: null
-  shapefiles: null
+base_path: data/V6GL
 
-output:
-  pm25__randall: 
+dirs:
+  input:
+    raw: 
+      yearly: null
+      monthly: null
+    shapefiles: null
+
+  output:
     zcta_yearly: null
     zcta_monthly: null
     county_yearly: null
