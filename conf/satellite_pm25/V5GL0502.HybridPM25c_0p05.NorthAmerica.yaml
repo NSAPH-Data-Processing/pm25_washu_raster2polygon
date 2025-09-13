@@ -1,0 +1,19 @@
+yearly:
+  url: https://wustl.app.box.com/v/ACAG-V5GL0502-GWRPM25c0p05/folder/293383209520
+
+  zipname: Annual
+
+  file_prefix: "V5GL0502.HybridPM25c_0p05.NorthAmerica"
+  #file name convention is V5GL0502.HybridPM25c_0p05.NorthAmerica.yyyymm-yyyymm.nc
+
+monthly:
+  url: https://wustl.app.box.com/v/ACAG-V5GL0502-GWRPM25c0p05/folder/293385030318
+
+  zipname: Monthly
+
+  file_prefix: "V5GL0502.HybridPM25c_0p05.NorthAmerica"
+  #file name convention is V5GL0502.HybridPM25c_0p05.NorthAmerica.yyyymm-yyyymm.nc
+
+layer: "GWRPM25" #geographic weighted regression PM2.5
+latitude_layer: "lat"
+longitude_layer: "lon"
