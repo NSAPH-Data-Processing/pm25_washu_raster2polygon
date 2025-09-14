@@ -39,7 +39,7 @@ def main(cfg):
     #use previously available shapefile
     shapefile_year = available_shapefile_year(cfg.year, shapefile_years_list)
 
-    shape_path = f'data/input/shapefiles/shapefile_{cfg.polygon_name}_{shapefile_year}/shapefile.shp'
+    shape_path = f'{cfg.datapaths.base_path}/input/shapefiles/shapefile_{cfg.polygon_name}_{shapefile_year}/shapefile.shp'
     polygon = gpd.read_file(shape_path)
     polygon_ids = polygon[cfg.shapefiles[cfg.polygon_name][shapefile_year].idvar].values
 
@@ -62,7 +62,7 @@ def main(cfg):
     # load the first file to obtain the affine transform/boundaries
     LOGGER.info("Mapping polygons to raster cells.")
 
-    ds = xarray.open_dataset(f"data/input/pm25__randall__raw/{cfg.temporal_freq}/{filenames[0]}")
+    ds = xarray.open_dataset(f"{cfg.datapaths.base_path}/input/raw/{cfg.temporal_freq}/{filenames[0]}")
     layer = getattr(ds, cfg.satellite_pm25.layer)
 
     # obtain affine transform/boundaries
@@ -90,7 +90,7 @@ def main(cfg):
 
         if i > 0:
             # reload the file only if it is different from the first one
-            ds = xarray.open_dataset(f"data/input/pm25__randall__raw/{cfg.temporal_freq}/{filename}")
+            ds = xarray.open_dataset(f"{cfg.datapaths.base_path}/input/raw/{cfg.temporal_freq}/{filename}")
             layer = getattr(ds, cfg.satellite_pm25.layer)
 
         # === obtain stats quickly using precomputed mapping
@@ -119,7 +119,7 @@ def main(cfg):
             df["month"] = month
             output_filename = f"pm25__randall__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}_{month}.parquet"
 
-        output_path = f"data/output/pm25__randall/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
+        output_path = f"{cfg.datapaths.base_path}/output/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
         df.to_parquet(output_path)
 
         # plot aggregation map using geopandas
