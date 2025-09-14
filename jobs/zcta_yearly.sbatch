@@ -8,4 +8,3 @@
 #singularity exec $HOME/singularity_images/satellite_pm25_raster2polygon_latest.sif snakemake --cores 16 -C polygon_name=zcta temporal_freq=monthly
 
 snakemake --cores 32 -C polygon_name=zcta temporal_freq=yearly
-
