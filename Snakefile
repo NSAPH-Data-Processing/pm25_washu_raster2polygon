@@ -17,10 +17,10 @@ temporal_freq = config['temporal_freq']
 polygon_name = config['polygon_name']
 
 with initialize(version_base=None, config_path="conf"):
-    hydra_cfg = compose(config_name="config", overrides=[f"temporal_freq={temporal_freq}", f"polygon_name={polygon_name}"])
+    cfg = compose(config_name="config", overrides=[f"temporal_freq={temporal_freq}", f"polygon_name={polygon_name}"])
 
-satellite_pm25_cfg = hydra_cfg.satellite_pm25
-shapefiles_cfg = hydra_cfg.shapefiles
+satellite_pm25_cfg = cfg.satellite_pm25
+shapefiles_cfg = cfg.shapefiles
 
 shapefile_years_list = list(shapefiles_cfg[polygon_name].keys())
 
@@ -31,7 +31,7 @@ years_list = list(range(1998, 2023 + 1))
 rule all:
     input:
         expand(
-            f"data/output/pm25__randall/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__" +  
+            f"{cfg.datapaths.base_path}/output/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__" +  
                 ("{year}.parquet" if temporal_freq == 'yearly' else "{year}_{month}.parquet"), 
             year=years_list,
             month=months_list
@@ -40,14 +40,14 @@ rule all:
 # remove and use symlink to the us census geoboundaries 
 rule download_shapefiles:
     output:
-        f"data/input/shapefiles/shapefile_{polygon_name}_" + "{shapefile_year}/shapefile.shp" 
+        f"{cfg.datapaths.base_path}/input/shapefiles/shapefile_{polygon_name}_" + "{shapefile_year}/shapefile.shp" 
     shell:
         f"python src/download_shapefile.py polygon_name={polygon_name} " + "shapefile_year={wildcards.shapefile_year}"
 
 rule download_satellite_pm25:
     output:
         expand(
-            f"data/input/pm25__randall__raw/{temporal_freq}/{satellite_pm25_cfg[temporal_freq]['file_prefix']}." + 
+            f"{cfg.datapaths.base_path}/input/raw/{temporal_freq}/{satellite_pm25_cfg[temporal_freq]['file_prefix']}." + 
             ("{year}01-{year}12.nc" if temporal_freq == 'yearly' else "{year}{month}-{year}{month}.nc"), 
             year=years_list,
             month=months_list)
@@ -58,20 +58,20 @@ rule download_satellite_pm25:
 
 def get_shapefile_input(wildcards):
     shapefile_year = available_shapefile_year(int(wildcards.year), shapefile_years_list)
-    return f"data/input/shapefiles/shapefile_{polygon_name}_{shapefile_year}/shapefile.shp"
+    return f"{cfg.datapaths.base_path}/input/shapefiles/shapefile_{polygon_name}_{shapefile_year}/shapefile.shp"
 
 rule aggregate_pm25:
     input:
         get_shapefile_input,
         expand(
-            f"data/input/pm25__randall__raw/{temporal_freq}/{satellite_pm25_cfg[temporal_freq]['file_prefix']}." + 
+            f"{cfg.datapaths.base_path}/input/raw/{temporal_freq}/{satellite_pm25_cfg[temporal_freq]['file_prefix']}." + 
             ("{{year}}01-{{year}}12.nc" if temporal_freq == 'yearly' else "{{year}}{month}-{{year}}{month}.nc"), 
             month=months_list
         )
 
     output:
         expand(
-            f"data/output/pm25__randall/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__" + 
+            f"{cfg.datapaths.base_path}/output/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__" + 
             ("{{year}}.parquet" if temporal_freq == 'yearly' else "{{year}}_{month}.parquet"), 
             month=months_list  # we only want to expand months_list and keep year as wildcard
         )
