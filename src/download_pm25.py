@@ -78,16 +78,20 @@ def main(cfg):
         with zipfile.ZipFile(download_zip, "r") as zip_ref:
             zip_ref.extractall(download_dir)
 
-        # Move all files from the src_dir to dest_dir
+        # Move all files from the src_dir to dest_dir, flattening the directory structure
         os.makedirs(dest_dir, exist_ok=True)
-        for file in os.listdir(src_dir):
-            shutil.move(os.path.join(src_dir, file), dest_dir)
+        for root, dirs, files in os.walk(src_dir):
+            for file in files:
+                src_file = os.path.join(root, file)
+                dest_file = os.path.join(dest_dir, file)
+                shutil.move(src_file, dest_file)
+                logger.info(f"Moved {file} to {dest_dir}")
 
-        # Remove the zip file and the empty folder
+        # Remove the zip file and the source folder (including any empty subfolders)
         os.remove(download_zip)
-        os.rmdir(src_dir)
+        shutil.rmtree(src_dir)
 
-        # Remove anyfile starging with Unconfirmed (this might be a Chrome bug/artifact)
+        # Remove any file starting with Unconfirmed (this might be a Chrome bug/artifact)
         for file in os.listdir(download_dir):
             if file.startswith("Unconfirmed"):
                 os.remove(os.path.join(download_dir, file))
