@@ -13,6 +13,6 @@ monthly:
   file_prefix: "V6GL02.04.CNNPM25.0p10.NA"
   #file name convention is V6GL02.04.CNNPM25.0p10.NA.yyyymm-yyyymm.nc
 
-layer: "GWRPM25" #geographic weighted regression PM2.5
+layer: "PM25" #CNN PM2.5
 latitude_layer: "lat"
 longitude_layer: "lon"
