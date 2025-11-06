@@ -83,3 +83,18 @@ rule aggregate_pm25:
             ("year={wildcards.year}" if temporal_freq == 'yearly' else "year={wildcards.year}") +
             " &> {log}"
         )
+
+rule concat_monthly:
+    input:
+        expand(
+            f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{{year}}_{month}.parquet",
+            month=[str(i).zfill(2) for i in range(1, 12 + 1)]
+        )
+    output:
+        yearly_file=f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{{year}}.parquet",
+        intermediate_dir=directory(f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/intermediate")
+    log:
+        f"logs/concat_monthly_{polygon_name}_{{year}}.log"
+    shell:
+        f"PYTHONPATH=. python src/concat_monthly.py polygon_name={polygon_name} &> {{log}}"
+
