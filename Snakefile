@@ -25,7 +25,7 @@ shapefiles_cfg = cfg.shapefiles
 shapefile_years_list = list(shapefiles_cfg[polygon_name].keys())
 
 months_list = "01" if temporal_freq == 'yearly' else [str(i).zfill(2) for i in range(1, 12 + 1)]
-years_list = list(range(1998, 2023 + 1))
+years_list = list(range(2022, 2023 + 1))
 
 # == Define rules ==
 rule all:
@@ -35,6 +35,16 @@ rule all:
                 ("{year}.parquet" if temporal_freq == 'yearly' else "{year}_{month}.parquet"), 
             year=years_list,
             month=months_list
+        ) if temporal_freq == 'yearly' else (
+            expand(
+                cfg.datapaths.base_path + "/output/" + polygon_name + "_monthly/pm25__randall__" + polygon_name + "_monthly__{year}_{month}.parquet",
+                year=years_list,
+                month=[str(i).zfill(2) for i in range(1, 12 + 1)]
+            ) +
+            expand(
+                cfg.datapaths.base_path + "/output/" + polygon_name + "_monthly/pm25__randall__" + polygon_name + "_monthly__{year}.parquet",
+                year=years_list
+            )
         )
 
 # remove and use symlink to the us census geoboundaries 
@@ -85,16 +95,20 @@ rule aggregate_pm25:
         )
 
 rule concat_monthly:
+    # This rule is only needed when temporal_freq is 'monthly' to create yearly files
+    # Combines monthly parquet files into a single yearly parquet file for each year.
     input:
-        expand(
-            f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{{year}}_{month}.parquet",
+        lambda wildcards: expand(
+            cfg.datapaths.base_path + "/output/" + polygon_name + "_monthly/pm25__randall__" + polygon_name + "_monthly__" + wildcards.year + "_{month}.parquet",
             month=[str(i).zfill(2) for i in range(1, 12 + 1)]
         )
     output:
-        yearly_file=f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{{year}}.parquet",
-        intermediate_dir=directory(f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/intermediate")
+        yearly_file=f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{{year}}.parquet"
     log:
         f"logs/concat_monthly_{polygon_name}_{{year}}.log"
     shell:
-        f"PYTHONPATH=. python src/concat_monthly.py polygon_name={polygon_name} &> {{log}}"
+        f"PYTHONPATH=. python src/concat_monthly.py polygon_name={polygon_name} year={{wildcards.year}} &> {{log}}"
+
+
+
 

@@ -7,50 +7,21 @@ and combines all 12 months for each year into a single yearly file.
 After consolidation, moves monthly files to an intermediate subdirectory.
 
 Usage:
-    python src/consolidate_monthly_to_yearly.py
+    python src/concat_monthly.py year=2020
     
     # With overrides:
-    python src/consolidate_monthly_to_yearly.py polygon_name=zcta
+    python src/concat_monthly.py polygon_name=zcta year=2020
 """
 
 import pandas as pd
 import os
 import hydra
 import logging
-import re
 import shutil
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s][%(levelname)s] - %(message)s')
 LOGGER = logging.getLogger(__name__)
-
-
-def discover_available_years(input_dir, polygon_name):
-    """
-    Discover all years that have monthly data available.
-    
-    Args:
-        input_dir: Directory containing monthly parquet files
-        polygon_name: Name of polygon type (county, zcta, etc.)
-    
-    Returns:
-        Set of years (integers) that have at least one monthly file
-    """
-    years = set()
-    # Pattern: pm25__randall__county_monthly__2020_01.parquet
-    pattern = re.compile(rf"pm25__randall__{polygon_name}_monthly__(\d{{4}})_\d{{2}}\.parquet")
-    
-    if not os.path.exists(input_dir):
-        LOGGER.warning(f"Input directory does not exist: {input_dir}")
-        return years
-    
-    for filename in os.listdir(input_dir):
-        match = pattern.match(filename)
-        if match:
-            year = int(match.group(1))
-            years.add(year)
-    
-    return sorted(years)
 
 
 def consolidate_year(input_dir, year, polygon_name, input_freq="monthly"):
@@ -65,7 +36,7 @@ def consolidate_year(input_dir, year, polygon_name, input_freq="monthly"):
         input_freq: Frequency of input files (monthly)
     
     Returns:
-        Tuple of (success: bool, monthly_files: list) - list of files that were consolidated
+        List of monthly files that were consolidated
     """
     monthly_files = []
     
@@ -83,7 +54,7 @@ def consolidate_year(input_dir, year, polygon_name, input_freq="monthly"):
     
     if not monthly_files:
         LOGGER.error(f"No monthly files found for year {year}")
-        return False, []
+        raise FileNotFoundError(f"No monthly files found for year {year}")
     
     if len(monthly_files) != 12:
         LOGGER.warning(f"Only found {len(monthly_files)}/12 months for year {year}")
@@ -103,7 +74,8 @@ def consolidate_year(input_dir, year, polygon_name, input_freq="monthly"):
     LOGGER.info(f"Saving consolidated file: {output_file} ({len(yearly_df)} rows)")
     yearly_df.to_parquet(output_file)
     
-    return True, monthly_files
+    return monthly_files
+
 
 
 def move_to_intermediate(monthly_files, input_dir):
@@ -132,55 +104,32 @@ def move_to_intermediate(monthly_files, input_dir):
 @hydra.main(config_path="../conf", config_name="config", version_base=None)
 def main(cfg):
     """
-    Consolidate monthly PM2.5 files into yearly files using Hydra configuration.
-    Automatically discovers all available years and processes them.
+    Consolidate monthly PM2.5 files for a specific year into a yearly file using Hydra configuration.
     After consolidation, moves monthly files to intermediate subdirectory.
     """
     
     polygon_name = cfg.polygon_name
+    year = cfg.year
     
     # Build path using datapaths configuration - output to same dir as input
     monthly_dir = f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly"
     
     LOGGER.info(f"Polygon name: {polygon_name}")
+    LOGGER.info(f"Year: {year}")
     LOGGER.info(f"Monthly directory: {monthly_dir}")
     
-    # Discover available years
-    available_years = discover_available_years(monthly_dir, polygon_name)
-    
-    if not available_years:
-        LOGGER.error(f"No monthly files found in {monthly_dir}")
-        return
-    
-    LOGGER.info(f"Found {len(available_years)} years with monthly data: {min(available_years)}-{max(available_years)}")
-    
-    success_count = 0
-    fail_count = 0
-    all_monthly_files = []
-    
-    # Process each year
-    for year in available_years:
-        try:
-            success, monthly_files = consolidate_year(monthly_dir, year, polygon_name)
-            if success:
-                success_count += 1
-                all_monthly_files.extend(monthly_files)
-            else:
-                fail_count += 1
-        except Exception as e:
-            LOGGER.error(f"Error processing year {year}: {e}")
-            fail_count += 1
-    
-    LOGGER.info(f"Consolidation complete: {success_count} years successful, {fail_count} failed")
-    
-    # Move all monthly files to intermediate directory
-    if all_monthly_files:
-        LOGGER.info(f"Moving {len(all_monthly_files)} monthly files to intermediate/")
-        move_to_intermediate(all_monthly_files, monthly_dir)
-    else:
-        LOGGER.warning("No monthly files to move to intermediate directory")
+    # Process the specified year
+    try:
+        monthly_files = consolidate_year(monthly_dir, year, polygon_name)
+        LOGGER.info(f"Successfully consolidated {len(monthly_files)} monthly files for year {year}")
+        
+        # Move monthly files to intermediate directory
+        move_to_intermediate(monthly_files, monthly_dir)
+        
+    except Exception as e:
+        LOGGER.error(f"Error processing year {year}: {e}")
+        raise
 
 
 if __name__ == "__main__":
     main()
-
