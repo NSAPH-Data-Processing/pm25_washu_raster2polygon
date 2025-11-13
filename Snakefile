@@ -32,19 +32,11 @@ rule all:
     input:
         expand(
             f"{cfg.datapaths.base_path}/output/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__" +  
-                ("{year}.parquet" if temporal_freq == 'yearly' else "{year}_{month}.parquet"), 
-            year=years_list,
-            month=months_list
-        ) if temporal_freq == 'yearly' else (
-            expand(
-                cfg.datapaths.base_path + "/output/" + polygon_name + "_monthly/pm25__randall__" + polygon_name + "_monthly__{year}_{month}.parquet",
-                year=years_list,
-                month=[str(i).zfill(2) for i in range(1, 12 + 1)]
-            ) +
-            expand(
-                cfg.datapaths.base_path + "/output/" + polygon_name + "_monthly/pm25__randall__" + polygon_name + "_monthly__{year}.parquet",
-                year=years_list
-            )
+                "{year}.parquet", 
+            year=years_list
+        ) if temporal_freq == 'yearly' else expand(
+            f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__" + "{year}.parquet",
+            year=years_list
         )
 
 # remove and use symlink to the us census geoboundaries 
@@ -80,11 +72,10 @@ rule aggregate_pm25:
         )
 
     output:
-        expand(
-            f"{cfg.datapaths.base_path}/output/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__" + 
-            ("{{year}}.parquet" if temporal_freq == 'yearly' else "{{year}}_{month}.parquet"), 
-            month=months_list  # we only want to expand months_list and keep year as wildcard
-        )
+        [f"{cfg.datapaths.base_path}/output/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__{{year}}.parquet"] if temporal_freq == 'yearly' else [
+            f"{cfg.datapaths.base_path}/intermediate/{polygon_name}_{temporal_freq}/pm25__randall__{polygon_name}_{temporal_freq}__{{year}}_{month}.parquet"
+            for month in months_list
+        ]
     log:
         f"logs/satellite_pm25_{polygon_name}_{{year}}.log"
     shell:
@@ -96,18 +87,18 @@ rule aggregate_pm25:
 
 rule concat_monthly:
     # This rule is only needed when temporal_freq is 'monthly' to create yearly files
-    # Combines monthly parquet files into a single yearly parquet file for each year.
+    # Combines monthly parquet files from intermediate directory into a single yearly parquet file
     input:
         lambda wildcards: expand(
-            cfg.datapaths.base_path + "/output/" + polygon_name + "_monthly/pm25__randall__" + polygon_name + "_monthly__" + wildcards.year + "_{month}.parquet",
+            f"{cfg.datapaths.base_path}/intermediate/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__" + wildcards.year + "_{month}.parquet",
             month=[str(i).zfill(2) for i in range(1, 12 + 1)]
         )
     output:
-        yearly_file=f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{{year}}.parquet"
+        yearly_file=f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__" + "{year}.parquet"
     log:
-        f"logs/concat_monthly_{polygon_name}_{{year}}.log"
+        f"logs/concat_monthly_{polygon_name}_" + "{year}.log"
     shell:
-        f"PYTHONPATH=. python src/concat_monthly.py polygon_name={polygon_name} year={{wildcards.year}} &> {{log}}"
+        f"PYTHONPATH=. python src/concat_monthly.py polygon_name={polygon_name} " + "year={wildcards.year} &> {log}"
 
 
 
