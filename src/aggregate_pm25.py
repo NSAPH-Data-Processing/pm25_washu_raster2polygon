@@ -112,14 +112,16 @@ def main(cfg):
         if cfg.temporal_freq == "yearly":
             # ignore month since len(filenames) == 1
             output_filename = f"pm25__randall__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}.parquet"
+            output_path = f"{cfg.datapaths.base_path}/output/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
 
         elif cfg.temporal_freq == "monthly":
             # use month in filename since len(filenames) = 12
             month = f"{i + 1:02d}"
             df["month"] = month
             output_filename = f"pm25__randall__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}_{month}.parquet"
+            # Save monthly outputs to intermediate folder
+            output_path = f"{cfg.datapaths.base_path}/output/{cfg.polygon_name}_{cfg.temporal_freq}/intermediate/{output_filename}"
 
-        output_path = f"{cfg.datapaths.base_path}/output/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
         df.to_parquet(output_path)
 
         # plot aggregation map using geopandas
