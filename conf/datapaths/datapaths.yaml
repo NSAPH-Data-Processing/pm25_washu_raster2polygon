@@ -7,6 +7,9 @@ dirs:
       monthly: null
     shapefiles: null
 
+  intermediate:
+    zcta_monthly: null
+    county_monthly: null
   output:
     zcta_yearly: null
     zcta_monthly: null

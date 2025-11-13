@@ -120,7 +120,7 @@ def main(cfg):
             df["month"] = month
             output_filename = f"pm25__randall__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}_{month}.parquet"
             # Save monthly outputs to intermediate folder
-            output_path = f"{cfg.datapaths.base_path}/output/{cfg.polygon_name}_{cfg.temporal_freq}/intermediate/{output_filename}"
+            output_path = f"{cfg.datapaths.base_path}/intermediate/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
 
         df.to_parquet(output_path)
 

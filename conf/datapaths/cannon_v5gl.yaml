@@ -6,6 +6,10 @@ dirs:
       yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/raw/yearly #/n/netscratch/dominici_lab/Lab/pm25__randall__raw/yearly 
       monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/raw/monthly #/n/netscratch/dominici_lab/Lab/pm25__randall__raw/monthly
     shapefiles: null
+    
+  intermediate:
+    zcta_monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/intermediate/zcta_monthly
+    county_monthly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/intermediate/county_monthly
 
   output:
     zcta_yearly: /n/dominici_lab/lab/lego/environmental/pm25__randall/V5GL/zcta_yearly

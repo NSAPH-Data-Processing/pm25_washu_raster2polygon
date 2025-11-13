@@ -67,7 +67,7 @@ def consolidate_year(intermediate_dir, output_dir, year, polygon_name, input_fre
     if 'month' in yearly_df.columns:
         yearly_df = yearly_df.sort_values(['month'])
     
-    # Save yearly file to output directory (not intermediate)
+    # Save yearly file to output directory
     # Pattern: pm25__randall__county_monthly__2020.parquet
     output_file = os.path.join(output_dir, f"pm25__randall__{polygon_name}_monthly__{year}.parquet")
     LOGGER.info(f"Saving consolidated file: {output_file} ({len(yearly_df)} rows)")
@@ -90,7 +90,7 @@ def main(cfg):
     
     # Build paths using datapaths configuration
     monthly_dir = f"{cfg.datapaths.base_path}/output/{polygon_name}_monthly"
-    intermediate_dir = f"{monthly_dir}/intermediate"
+    intermediate_dir = f"{cfg.datapaths.base_path}/intermediate/{polygon_name}_monthly"
     
     LOGGER.info(f"Polygon name: {polygon_name}")
     LOGGER.info(f"Year: {year}")
