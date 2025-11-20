@@ -35,13 +35,16 @@ def main(cfg):
 
     # == load shapefile
     LOGGER.info("Loading shapefile.")
-    shapefile_years_list = list(cfg.shapefiles[cfg.polygon_name].keys())
+    shapefile_years_list = cfg.shapefiles[cfg.polygon_name].years
     #use previously available shapefile
     shapefile_year = available_shapefile_year(cfg.year, shapefile_years_list)
+    shapefile_prefix = cfg.shapefiles[cfg.polygon_name].prefix
+    shapefile_name = f"{shapefile_prefix}{shapefile_year}"
 
-    shape_path = f'{cfg.datapaths.base_path}/input/shapefiles/shapefile_{cfg.polygon_name}_{shapefile_year}/shapefile.shp'
+    shape_path = f'{cfg.datapaths.base_path}/input/shapefiles/{cfg.polygon_name}_yearly/{shapefile_name}/{shapefile_name}.shp'
+    LOGGER.info(f"Loading shapefile from: {shape_path}")
     polygon = gpd.read_file(shape_path)
-    polygon_ids = polygon[cfg.shapefiles[cfg.polygon_name][shapefile_year].idvar].values
+    polygon_ids = polygon[cfg.shapefiles[cfg.polygon_name].idvar].values
 
     # == filenames to be aggregated
     if cfg.temporal_freq == "yearly":

@@ -22,10 +22,10 @@ with initialize(version_base=None, config_path="conf"):
 satellite_pm25_cfg = cfg.satellite_pm25
 shapefiles_cfg = cfg.shapefiles
 
-shapefile_years_list = list(shapefiles_cfg[polygon_name].keys())
+shapefile_years_list = shapefiles_cfg[polygon_name].years
 
 months_list = "01" if temporal_freq == 'yearly' else [str(i).zfill(2) for i in range(1, 12 + 1)]
-years_list = list(range(2022, 2023 + 1))
+years_list = list(range(1998, 2023 + 1))
 
 # == Define rules ==
 rule all:
@@ -42,7 +42,7 @@ rule all:
 # remove and use symlink to the us census geoboundaries 
 rule download_shapefiles:
     output:
-        f"{cfg.datapaths.base_path}/input/shapefiles/shapefile_{polygon_name}_" + "{shapefile_year}/shapefile.shp" 
+        f"{cfg.datapaths.base_path}/input/shapefiles/{shapefiles_cfg[polygon_name].prefix}" + "{shapefile_year}/{shapefiles_cfg[polygon_name].prefix}" + "{shapefile_year}.shp" 
     shell:
         f"python src/download_shapefile.py polygon_name={polygon_name} " + "shapefile_year={wildcards.shapefile_year}"
 
@@ -60,7 +60,9 @@ rule download_satellite_pm25:
 
 def get_shapefile_input(wildcards):
     shapefile_year = available_shapefile_year(int(wildcards.year), shapefile_years_list)
-    return f"{cfg.datapaths.base_path}/input/shapefiles/shapefile_{polygon_name}_{shapefile_year}/shapefile.shp"
+    shapefile_prefix = shapefiles_cfg[polygon_name].prefix
+    shapefile_name = f"{shapefile_prefix}{shapefile_year}"
+    return f"{cfg.datapaths.base_path}/input/shapefiles/{polygon_name}_yearly/{shapefile_name}/{shapefile_name}.shp"
 
 rule aggregate_pm25:
     input:
