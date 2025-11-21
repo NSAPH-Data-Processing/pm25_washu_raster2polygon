@@ -29,26 +29,89 @@ Aaron van Donkelaar, Melanie S. Hammer, Liam Bindle, Michael Brauer, Jeffery R. 
 
 # Codebook
 
-## Dataset Columns:
+## Dataset Output Structure
 
-* county aggregations:
+The pipeline produces parquet files with PM2.5 aggregations at the polygon level.
 
-* zcta aggregations:
+### Yearly aggregations (`temporal_freq=yearly`):
+
+Output path: `data/V5GL/output/{polygon_name}_yearly/pm25__randall__{polygon_name}_yearly__{year}.parquet`
+
+Columns:
+* `{polygon_id}` (index): County FIPS code, ZCTA code, or Census Tract GEOID depending on polygon type
+* `pm25` (float64): Mean PM2.5 concentration (µg/m³) for the year
+* `year` (int64): Year of observation
+
+### Monthly aggregations (`temporal_freq=monthly`):
+
+Output path: `data/V5GL/output/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{year}.parquet`
+
+Columns:
+* `{polygon_id}` (index): County FIPS code, ZCTA code, or Census Tract GEOID depending on polygon type
+* `pm25` (float64): Mean PM2.5 concentration (µg/m³) for the month
+* `year` (int64): Year of observation
+* `month` (object/int): Month of observation
+
+### Polygon ID Variables
+
+The index column name varies by polygon type and is defined in `conf/shapefiles/shapefiles.yaml`:
+* **County**: `county` (5-digit FIPS code, e.g., "01001" for Autauga County, Alabama)
+* **ZCTA**: `zcta` (5-digit ZIP Code Tabulation Area, e.g., "00601")
+* **Census Tract**: `GEOID` (11-digit census tract identifier)
+
+### Intermediate Files (Monthly only)
+
+During monthly processing, intermediate files are created:
+* Path: `data/V5GL/intermediate/{polygon_name}_monthly/pm25__randall__{polygon_name}_monthly__{year}_{month}.parquet`
+* These are concatenated into yearly files in the output directory
 
 ---
 
 # Configuration files
 
-The configuration structure withing the `/conf` folder allow you to modify the input parameters for the following steps:
+The configuration structure within the `/conf` folder allows you to modify the input parameters for the following steps:
 
-* create directory paths: `utils/create_dir_paths.py`
+* create directory paths: `src/create_datapaths.py`
 * download pm25: `src/download_pm25.py`
 * download shapefiles: `src/download_shapefile.py`
 * aggregate pm25: `src/aggregate_pm25.py`
+* concatenate monthly files: `src/concat_monthly.py`
 
 The key parameters are:
 * `temporal_freq` which determines whether the original yearly or monthly pm25 files will be aggregated. The options are: `yearly` and `monthly`.
-* `polygon_name` which determines into which polygons the pm25 grid will the aggregated. The options are: `zcta` and `county`.
+* `polygon_name` which determines into which polygons the pm25 grid will be aggregated. The options are: `zcta`, `county`, and `census_tract`.
+
+## Configuration Structure
+
+The configuration system uses Hydra with the following structure:
+
+* `/conf/config.yaml` - Main configuration file with default settings
+* `/conf/datapaths/` - Data path configurations for different environments:
+  * `cannon_v5gl.yaml` - Paths for V5GL data on Cannon cluster
+  * `cannon_v6gl.yaml` - Paths for V6GL data on Cannon cluster
+  * `datapaths.yaml` - Template configuration
+* `/conf/shapefiles/shapefiles.yaml` - Shapefile metadata including:
+  * Available years for each polygon type
+  * ID column names (`idvar`)
+  * File naming prefixes
+  * Download URLs (optional, via `url_map`)
+* `/conf/satellite_pm25/` - PM2.5 dataset configurations for different versions
+* `/conf/snakemake.yaml` - Default parameters for Snakemake workflow
+
+## Shapefile Configuration
+
+Shapefiles can be obtained in two ways:
+
+1. **Symlinks to existing Lab shapefiles** (recommended for Cannon cluster):
+   ```bash
+   python src/create_datapaths.py
+   ```
+   This creates symbolic links from the project's `data/` directory to the Lab's existing shapefile repository at `/n/dominici_lab/lab/lego/geoboundaries/`.
+
+2. **Direct download** from Census Bureau (optional):
+   Shapefiles can be downloaded automatically if URLs are configured in `conf/shapefiles/shapefiles.yaml`. The download script will use the `url_map` for the specified year.
+
+The pipeline uses backward compatibility for shapefiles - if PM2.5 data is from a year without an exact shapefile match, it automatically selects the most recent prior shapefile year available.
 
 ---
 
@@ -75,17 +138,37 @@ mamba activate <env_name>
 
 ## Input and output paths
 
-Run
+The pipeline requires setting up directory paths and symbolic links to data sources. Run:
 
 ```bash
-python utils/create_dir_paths.py 
+python src/create_datapaths.py
+```
+
+This script:
+* Creates the base directory structure under `data/V5GL/` (or `data/V6GL/` depending on configuration)
+* Creates symbolic links to:
+  * PM2.5 raw data at `/n/dominici_lab/lab/lego/environmental/pm25__randall/`
+  * Shapefiles at `/n/dominici_lab/lab/lego/geoboundaries/us_geoboundaries__census/us_shapefile__census/`
+  * Output directories for aggregated results
+
+To use a different configuration, specify the datapaths config file:
+
+```bash
+python src/create_datapaths.py datapaths=cannon_v6gl
 ```
 
 ## Pipeline
 
-You can run the pipeline steps manually or run the snakemake pipeline described in the Snakefile.
+The pipeline consists of four main steps:
 
-**run pipeline steps manually**
+1. **Download/link shapefiles**: Obtain or link to US Census shapefiles (counties, ZCTAs, or census tracts)
+2. **Download PM2.5 data**: Download satellite PM2.5 NetCDF files from Washington University
+3. **Aggregate PM2.5**: Perform spatial aggregation from raster grid to polygons
+4. **Concatenate monthly files** (monthly frequency only): Combine monthly parquet files into yearly files
+
+You can run the pipeline steps manually or use the Snakemake workflow.
+
+### Run pipeline steps manually
 
 ```bash
 python src/download_shapefile.py
