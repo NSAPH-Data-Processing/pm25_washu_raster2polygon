@@ -39,13 +39,6 @@ rule all:
             year=years_list
         )
 
-# remove and use symlink to the us census geoboundaries 
-rule download_shapefiles:
-    output:
-        f"{cfg.datapaths.base_path}/input/shapefiles/{shapefiles_cfg[polygon_name].prefix}" + "{shapefile_year}/{shapefiles_cfg[polygon_name].prefix}" + "{shapefile_year}.shp" 
-    shell:
-        f"python src/download_shapefile.py polygon_name={polygon_name} " + "shapefile_year={wildcards.shapefile_year}"
-
 rule download_satellite_pm25:
     output:
         expand(
