@@ -1,10 +1,8 @@
-# Shapefile metadata configuration following gridmet_raster2polygon pattern
+# Shapefile metadata configuration
 # Each polygon type contains:
 #   - years: list of available shapefile years
 #   - idvar: ID column name in the shapefile
 #   - prefix: shapefile directory/file naming prefix
-#   - url_map (optional): URLs for downloading shapefiles by year
-# Expected shapefile path structure: {prefix}{year}/{prefix}{year}.shp
 
 census_tract:
   years:
@@ -13,11 +11,7 @@ census_tract:
     - 2022
   idvar: "GEOID"
   prefix: "cb_us_tract_"
-  url_map:
-    2020: "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_tract_500k.zip"
-    2021: "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_tract_500k.zip"
-    2022: "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_tract_500k.zip"
-
+ 
 county: # County shapefiles (cartographic boundaries) https://www.census.gov/programs-surveys/geography/guidance/tiger-data-products-guide.html
   years:
     - 2013
@@ -33,19 +27,7 @@ county: # County shapefiles (cartographic boundaries) https://www.census.gov/pro
     - 2023
   idvar: "county"
   prefix: "us_shapefile__census__county_yearly__"
-  url_map:
-    2013: "https://www2.census.gov/geo/tiger/GENZ2013/cb_2013_us_county_500k.zip"
-    2014: "https://www2.census.gov/geo/tiger/GENZ2014/shp/cb_2014_us_county_500k.zip"
-    2015: "https://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip"
-    2016: "https://www2.census.gov/geo/tiger/GENZ2016/shp/cb_2016_us_county_500k.zip"
-    2017: "https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_us_county_500k.zip"
-    2018: "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_county_500k.zip"
-    2019: "https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_county_500k.zip"
-    2020: "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_500k.zip"
-    2021: "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_county_500k.zip"
-    2022: "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_500k.zip"
-    2023: "https://www2.census.gov/geo/tiger/GENZ2023/shp/cb_2023_us_county_500k.zip"
-
+  
 zcta: # ZCTA shapefiles (cartographic boundaries) https://www.census.gov/programs-surveys/geography/guidance/tiger-data-products-guide.html
   years:
     - 2000
@@ -53,7 +35,4 @@ zcta: # ZCTA shapefiles (cartographic boundaries) https://www.census.gov/program
     - 2020
   idvar: "zcta"
   prefix: "us_shapefile__census__zcta_yearly__"
-  url_map:
-    2000: "https://www2.census.gov/geo/tiger/GENZ2010/gz_2010_us_860_00_500k.zip"
-    2010: "https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_zcta510_500k.zip"
-    2020: "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_zcta520_500k.zip"
+ 
