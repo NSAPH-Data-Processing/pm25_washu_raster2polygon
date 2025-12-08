@@ -13,7 +13,7 @@ RUN mamba env update -n base -f requirements.yaml
 #&& mamba clean -a
 
 # Create paths to data placeholders
-RUN python utils/create_dir_paths.py datapaths.input.satellite_pm25.yearly=null datapaths.input.satellite_pm25.monthly=null
+RUN python src/create_datapaths.py
 
 # snakemake --configfile conf/config.yaml --cores 4 -C temporal_freq=yearly
 ENTRYPOINT ["snakemake", "--configfile", "conf/config.yaml"]
