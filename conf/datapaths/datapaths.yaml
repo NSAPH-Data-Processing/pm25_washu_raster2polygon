@@ -1,12 +1,16 @@
-# if files are stored within the local copy of the repository, then use null:
-input:
-  pm25__washu__raw: 
-    yearly: null
-    monthly: null
-  shapefiles: null
+base_path: data/V6GL
 
-output:
-  pm25__washu: 
+dirs:
+  input:
+    raw: 
+      yearly: null
+      monthly: null
+    shapefiles: null
+
+  intermediate:
+    zcta_monthly: null
+    county_monthly: null
+  output:
     zcta_yearly: null
     zcta_monthly: null
     county_yearly: null

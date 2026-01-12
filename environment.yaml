@@ -1,4 +1,4 @@
-name: satellite_pm25_raster2polygon
+name: pm25_randall
 channels:
   - conda-forge
   - defaults
@@ -19,6 +19,3 @@ dependencies:
     - selenium==4.29.0
     - chromedriver-binary==135.0.7030.0.0
     - tqdm==4.67.1
-    - torch==2.6.0
-    - torchaudio==2.6.0
-    - torchvision==0.21.0

@@ -35,13 +35,16 @@ def main(cfg):
 
     # == load shapefile
     LOGGER.info("Loading shapefile.")
-    shapefile_years_list = list(cfg.shapefiles[cfg.polygon_name].keys())
+    shapefile_years_list = cfg.shapefiles[cfg.polygon_name].years
     #use previously available shapefile
     shapefile_year = available_shapefile_year(cfg.year, shapefile_years_list)
+    shapefile_prefix = cfg.shapefiles[cfg.polygon_name].prefix
+    shapefile_name = f"{shapefile_prefix}{shapefile_year}"
 
-    shape_path = f'data/input/shapefiles/shapefile_{cfg.polygon_name}_{shapefile_year}/shapefile.shp'
+    shape_path = f'{cfg.datapaths.base_path}/input/shapefiles/{cfg.polygon_name}_yearly/{shapefile_name}/{shapefile_name}.shp'
+    LOGGER.info(f"Loading shapefile from: {shape_path}")
     polygon = gpd.read_file(shape_path)
-    polygon_ids = polygon[cfg.shapefiles[cfg.polygon_name][shapefile_year].idvar].values
+    polygon_ids = polygon[cfg.shapefiles[cfg.polygon_name].idvar].values
 
     # == filenames to be aggregated
     if cfg.temporal_freq == "yearly":
@@ -62,7 +65,7 @@ def main(cfg):
     # load the first file to obtain the affine transform/boundaries
     LOGGER.info("Mapping polygons to raster cells.")
 
-    ds = xarray.open_dataset(f"data/input/pm25__washu__raw/{cfg.temporal_freq}/{filenames[0]}")
+    ds = xarray.open_dataset(f"{cfg.datapaths.base_path}/input/raw/{cfg.temporal_freq}/{filenames[0]}")
     layer = getattr(ds, cfg.satellite_pm25.layer)
 
     # obtain affine transform/boundaries
@@ -90,7 +93,7 @@ def main(cfg):
 
         if i > 0:
             # reload the file only if it is different from the first one
-            ds = xarray.open_dataset(f"data/input/pm25__washu__raw/{cfg.temporal_freq}/{filename}")
+            ds = xarray.open_dataset(f"{cfg.datapaths.base_path}/input/raw/{cfg.temporal_freq}/{filename}")
             layer = getattr(ds, cfg.satellite_pm25.layer)
 
         # === obtain stats quickly using precomputed mapping
@@ -111,15 +114,17 @@ def main(cfg):
         # == save output file
         if cfg.temporal_freq == "yearly":
             # ignore month since len(filenames) == 1
-            output_filename = f"pm25__washu__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}.parquet"
+            output_filename = f"pm25__randall__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}.parquet"
+            output_path = f"{cfg.datapaths.base_path}/output/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
 
         elif cfg.temporal_freq == "monthly":
             # use month in filename since len(filenames) = 12
             month = f"{i + 1:02d}"
             df["month"] = month
-            output_filename = f"pm25__washu__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}_{month}.parquet"
+            output_filename = f"pm25__randall__{cfg.polygon_name}_{cfg.temporal_freq}__{cfg.year}_{month}.parquet"
+            # Save monthly outputs to intermediate folder
+            output_path = f"{cfg.datapaths.base_path}/intermediate/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
 
-        output_path = f"data/output/pm25__washu/{cfg.polygon_name}_{cfg.temporal_freq}/{output_filename}"
         df.to_parquet(output_path)
 
         # plot aggregation map using geopandas
