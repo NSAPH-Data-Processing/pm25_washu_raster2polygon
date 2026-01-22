@@ -1,17 +1,30 @@
 yearly:
-  url: https://wustl.app.box.com/s/s7eiaxytjr9w1z7glat45cesitcemprv/folder/327763225614
+  # Legacy Box URL (deprecated - use Dataverse instead)
+  # url: https://wustl.app.box.com/s/s7eiaxytjr9w1z7glat45cesitcemprv/folder/327763225614
+  # zipname: Annual
 
-  zipname: Annual
+  file_prefix: "V6GL02.04.CNNPM25.0p10.NA"
+  #file name convention is V6GL02.04.CNNPM25.0p10.NA.yyyymm-yyyymm.nc
+
+  dataverse:
+    # TODO: Replace these placeholders with actual Dataverse values after upload
+    server_url: "https://dataverse.harvard.edu"  # PLACEHOLDER - replace with your Dataverse instance URL
+    doi: "doi:10.7910/DVN/XXXXXXX"  # PLACEHOLDER - replace with actual DOI after upload
+    api_token: null  # PLACEHOLDER - set if dataset is restricted, otherwise leave null for public datasets
+
+monthly:
+  # Legacy Box URL (deprecated - use Dataverse instead)
+  # url: https://wustl.app.box.com/s/s7eiaxytjr9w1z7glat45cesitcemprv/folder/327764742544
+  # zipname: Monthly
 
   file_prefix: "V6GL02.04.CNNPM25.0p10.NA"
   #file name convention is V6GL02.04.CNNPM25.0p10.NA.yyyymm-yyyymm.nc
 
-monthly: 
-  url: https://wustl.app.box.com/s/s7eiaxytjr9w1z7glat45cesitcemprv/folder/327764742544
-  zipname: Monthly
-
-  file_prefix: "V6GL02.04.CNNPM25.0p10.NA"
-  #file name convention is V6GL02.04.CNNPM25.0p10.NA.yyyymm-yyyymm.nc
+  dataverse:
+    # TODO: Replace these placeholders with actual Dataverse values after upload
+    server_url: "https://dataverse.harvard.edu"  # PLACEHOLDER - replace with your Dataverse instance URL
+    doi: "doi:10.7910/DVN/XXXXXXX"  # PLACEHOLDER - replace with actual DOI after upload
+    api_token: null  # PLACEHOLDER - set if dataset is restricted, otherwise leave null for public datasets
 
 layer: "PM25" #CNN PM2.5
 latitude_layer: "lat"

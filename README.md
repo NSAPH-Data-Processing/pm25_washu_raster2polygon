@@ -125,15 +125,15 @@ Clone the repository and create a conda environment.
 git clone <https://github.com/<user>/repo>
 cd <repo>
 
-conda env create -f requirements.yml
-conda activate <env_name> #environment name as found in requirements.yml
+conda env create -f environment.yaml
+conda activate pm25_randall
 ```
 
 It is also possible to use `mamba`.
 
 ```bash
-mamba env create -f requirements.yml
-mamba activate <env_name>
+mamba env create -f environment.yaml
+mamba activate pm25_randall
 ```
 
 ## Input and output paths
@@ -162,9 +162,22 @@ python src/create_datapaths.py datapaths=cannon_v6gl
 The pipeline consists of four main steps:
 
 1. **Download/link shapefiles**: Obtain or link to US Census shapefiles (counties, ZCTAs, or census tracts)
-2. **Download PM2.5 data**: Download satellite PM2.5 NetCDF files from Washington University
+2. **Download PM2.5 data**: Download satellite PM2.5 NetCDF files from Dataverse (see below)
 3. **Aggregate PM2.5**: Perform spatial aggregation from raster grid to polygons
 4. **Concatenate monthly files** (monthly frequency only): Combine monthly parquet files into yearly files
+
+### Download PM2.5 data from Dataverse
+
+The raw PM2.5 NetCDF files are hosted on Dataverse. Before running the aggregation pipeline, download the data:
+
+```bash
+python src/download_pm25_dataverse.py
+```
+
+This script uses the Dataverse API to download files. Configuration is in `conf/satellite_pm25/*.yaml` under the `dataverse` section:
+* `server_url`: Dataverse instance URL (e.g., `https://dataverse.harvard.edu`)
+* `doi`: Dataset DOI (e.g., `doi:10.7910/DVN/XXXXXXX`)
+* `api_token`: Optional API token for restricted datasets
 
 You can run the pipeline steps manually or use the Snakemake workflow.
 
@@ -172,16 +185,17 @@ You can run the pipeline steps manually or use the Snakemake workflow.
 
 ```bash
 python src/download_shapefile.py
-python src/download_pm25.py
+python src/download_pm25_dataverse.py
 export PYTHONPATH=.
 python src/aggregate_pm25.py
 ```
 
-**run snakemake pipeline**
-or run the pipeline:
+**Run snakemake pipeline**
+
+Note: The Snakemake pipeline assumes PM2.5 data has already been downloaded. Run the download script first, then:
 
 ```bash
-snakemake --cores 4 -C polygon_name=county temporal_freq=yearly 
+snakemake --cores 4 -C polygon_name=county temporal_freq=yearly
 ```
 
 Modify `cores`, `polygon_name` and `temporal_freq` as you find convenient.

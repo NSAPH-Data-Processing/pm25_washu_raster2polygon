@@ -39,18 +39,6 @@ rule all:
             year=years_list
         )
 
-rule download_satellite_pm25:
-    output:
-        expand(
-            f"{cfg.datapaths.base_path}/input/raw/{temporal_freq}/{satellite_pm25_cfg[temporal_freq]['file_prefix']}." + 
-            ("{year}01-{year}12.nc" if temporal_freq == 'yearly' else "{year}{month}-{year}{month}.nc"), 
-            year=years_list,
-            month=months_list)
-    log:    
-        f"logs/download_satellite_pm25_{temporal_freq}.log"
-    shell:
-        f"python src/download_pm25.py temporal_freq={temporal_freq} " + " &> {log}"
-
 def get_shapefile_input(wildcards):
     shapefile_year = available_shapefile_year(int(wildcards.year), shapefile_years_list)
     shapefile_prefix = shapefiles_cfg[polygon_name].prefix

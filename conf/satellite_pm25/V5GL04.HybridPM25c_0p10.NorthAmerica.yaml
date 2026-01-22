@@ -1,28 +1,40 @@
 yearly:
-  url: https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25c0p10/folder/237172657388
+  # Legacy Box URL (deprecated - use Dataverse instead)
+  # url: https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25c0p10/folder/237172657388
   # https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25/folder/230744006317 #lower resolution
   # https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25c0p10/folder/237172657388 #higher resolution
-
-  zipname: Annual
+  # zipname: Annual
 
   file_prefix: "V5GL04.HybridPM25c_0p10.NorthAmerica"
   #file name convention is V5GL04.HybridPM25.NorthAmerica.yyyymm-yyyymm.nc
   # e.g. V5GL04.HybridPM25.NorthAmerica.201801-201812.nc is the file for 2018
   # "V5GL04.HybridPM25.NorthAmerica" #lower resolution
   # "V5GL04.HybridPM25c_0p10.NorthAmerica" #higher resolution
+
+  dataverse:
+    # TODO: Replace these placeholders with actual Dataverse values after upload
+    server_url: "https://dataverse.harvard.edu"  # PLACEHOLDER - replace with your Dataverse instance URL
+    doi: "doi:10.7910/DVN/XXXXXXX"  # PLACEHOLDER - replace with actual DOI after upload
+    api_token: null  # PLACEHOLDER - set if dataset is restricted, otherwise leave null for public datasets
 
 monthly:
-  url: https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25c0p10/folder/237170622689
+  # Legacy Box URL (deprecated - use Dataverse instead)
+  # url: https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25c0p10/folder/237170622689
   # https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25/folder/230743233223 #lower resolution
   # https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25c0p10/folder/237170622689 #higher resolution
-
-  zipname: Monthly
+  # zipname: Monthly
 
   file_prefix: "V5GL04.HybridPM25c_0p10.NorthAmerica"
   #file name convention is V5GL04.HybridPM25.NorthAmerica.yyyymm-yyyymm.nc
   # e.g. V5GL04.HybridPM25.NorthAmerica.201801-201812.nc is the file for 2018
   # "V5GL04.HybridPM25.NorthAmerica" #lower resolution
   # "V5GL04.HybridPM25c_0p10.NorthAmerica" #higher resolution
+
+  dataverse:
+    # TODO: Replace these placeholders with actual Dataverse values after upload
+    server_url: "https://dataverse.harvard.edu"  # PLACEHOLDER - replace with your Dataverse instance URL
+    doi: "doi:10.7910/DVN/XXXXXXX"  # PLACEHOLDER - replace with actual DOI after upload
+    api_token: null  # PLACEHOLDER - set if dataset is restricted, otherwise leave null for public datasets
 
 layer: "GWRPM25" #geographic weighted regression PM2.5
 latitude_layer: "lat"
