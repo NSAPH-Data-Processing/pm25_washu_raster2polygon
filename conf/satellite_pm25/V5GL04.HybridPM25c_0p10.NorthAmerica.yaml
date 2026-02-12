@@ -14,7 +14,7 @@ yearly:
   dataverse:
     # TODO: Replace these placeholders with actual Dataverse values after upload
     server_url: "https://dataverse.harvard.edu"  # PLACEHOLDER - replace with your Dataverse instance URL
-    doi: "doi:10.7910/DVN/XXXXXXX"  # PLACEHOLDER - replace with actual DOI after upload
+    doi: "doi:10.7910/DVN/G3JKAI"  
     api_token: null  # PLACEHOLDER - set if dataset is restricted, otherwise leave null for public datasets
 
 monthly:
@@ -33,7 +33,7 @@ monthly:
   dataverse:
     # TODO: Replace these placeholders with actual Dataverse values after upload
     server_url: "https://dataverse.harvard.edu"  # PLACEHOLDER - replace with your Dataverse instance URL
-    doi: "doi:10.7910/DVN/XXXXXXX"  # PLACEHOLDER - replace with actual DOI after upload
+    doi: "doi:10.7910/DVN/G3JKAI"  
     api_token: null  # PLACEHOLDER - set if dataset is restricted, otherwise leave null for public datasets
 
 layer: "GWRPM25" #geographic weighted regression PM2.5
